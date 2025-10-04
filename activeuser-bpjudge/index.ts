@@ -19,7 +19,10 @@ async function getActiveUser(domainId) {
         udoc.updateAt = sdoc?.updateAt;
         return udoc;
     }));
-    // console.log(udocs);
+    udocs.sort((a, b) => {
+        const now = new Date();
+        return Math.abs(a.updateAt - now) - Math.abs(b.updateAt - now);
+    });
     return [udocs];
 }
 
