@@ -1,6 +1,6 @@
 import {
     Handler, Context, UserModel, db,
-} from 'hydrooj'
+} from 'hydrooj';
 
 const token = db.collection('token');
 

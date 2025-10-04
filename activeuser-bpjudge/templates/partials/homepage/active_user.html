@@ -1,0 +1,21 @@
+{% set udocs = payload[0] %}
+<style>
+  .page--homepage #active_user {
+    margin-bottom: 10px
+  }
+</style>
+<div class="section side" id="active_users">
+  <div class="section__header">
+    <h1 class="section__title">2小时内活跃用户({{ udocs.length|default(0) }})</h1>
+  </div>
+  <div class="section__body">
+    <marquee direction="up" scrollamount="2" scrolldelay="0" height="400" hspace="10" onMouseOut="this.start()" onMouseOver="this.stop()">
+      {%- for udoc in udocs -%}
+        <div id="active_user"> 
+          {{ user.render_inline(udoc) }}
+          活跃于 {{ datetimeSpan(udoc['updateAt'])|safe if Date.now() - udoc.updateAt.getTime() > 300000 else _('just now') }}.
+        </div>
+      {%- endfor -%}
+    </marquee>
+  </div>
+</div>

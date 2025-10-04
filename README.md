@@ -2,10 +2,6 @@
 
 基于 [Hydro](https://github.com/hydro-dev/Hydro) 框架，已适配最新版。
 
-## onlineuser
-
-路由 `/onlineuser`。查询五分钟内活动过的会话。
-
 ## frontend
 
 -  用 uname color 代替 level badge。
@@ -45,3 +41,18 @@ difficulty 1-7 分别对应：
 ```
 
 其余难度为 "暂无评定"。
+
+## onlineuser
+
+路由 `/onlineuser`。查询五分钟内活动过的会话。
+
+
+## activeuser-bpjudge
+
+idea from [topscoding](https://topscoding.com/).
+
+首页滚动展示两小时内活跃用户。
+
+使用方法：
+
+进入控制面板->系统设置->`hydrooj.homepage` 添加如下配置： `active_user: true` 保存即可。
