@@ -1,0 +1,8 @@
+{
+  "name": "onlineuser-bpjudge",
+  "version": "0.0.1",
+  "description": "View Onlineuser",
+  "main": "index.ts",
+  "author": "BlackPanda",
+  "license": "AGPL-3.0"
+}

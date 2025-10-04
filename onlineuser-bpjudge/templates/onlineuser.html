@@ -1,0 +1,40 @@
+{% import "components/user.html" as user with context %}
+{% import "components/nothing.html" as nothing with context %}
+{% extends "layout/basic.html" %}
+
+{% block content %}
+<div class="row"><div class="medium-12 columns">
+  <div class="section">
+    {% if not udocs.length %}
+    {{ nothing.render('No Online Users') }}
+    {% else %}
+    <div class="section__header">
+      <h1 class="section__title">{{ _('There are {0} users online.').format(udocs.length) }}</h1>
+    </div>
+    <table class="data-table">
+      <colgroup>
+        <col class="col--uid">
+        <col class="col--user">
+        <col class="col--bio">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="col--uid">UID</th>
+          <th class="col--user">{{ _('Username') }}</th>
+          <th class="col--bio">{{ _('Bio') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {%- for udoc in udocs -%}
+        <tr>
+          <td class="col--uid">{{ udoc._id }}</td>
+          <td class="col--user">{{ user.render_inline(udoc) }}</td>
+          <td class="col--bio">{{ udoc.bio|default('')|truncate(64, true)|markdownInline|safe }}</td>
+        </tr>
+        {%- endfor -%}
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div></div>
+{% endblock %}
