@@ -2,7 +2,7 @@
 
 基于 [Hydro](https://github.com/hydro-dev/Hydro) 框架，已适配最新版。
 
-## frontend
+## frontend-bpjudge
 
 -  用 uname color 代替 level badge。
 
@@ -42,7 +42,7 @@ difficulty 1-7 分别对应：
 
 其余难度为 "暂无评定"。
 
-## onlineuser
+## onlineuser-bpjudge
 
 路由 `/onlineuser`。查询五分钟内活动过的会话。
 
