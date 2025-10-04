@@ -7,8 +7,6 @@ export const coll: Collection<Udoc> = db.collection('user');
 export const collV: Collection<VUdoc> = db.collection('vuser');
 export const collGroup: Collection<GDoc> = db.collection('user.group');
 
-export const description = '保证其他插件正常运行所需的初始化(getListForRender、sys-userpriv、switch-account)';
-
 export async function apply(ctx) {
     UserModel.getListForRender = async function (domainId: string, uids: number[], arg: string[] | boolean) {
         const fields = ['_id', 'uname', 'mail', 'avatar', 'school', 'studentId'].concat(arg instanceof Array ? arg : []);
