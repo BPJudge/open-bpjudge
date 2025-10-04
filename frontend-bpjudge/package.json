@@ -1,0 +1,8 @@
+{
+  "name": "frontend-bpjudge",
+  "version": "0.0.1",
+  "description": "frontend",
+  "main": "index.js",
+  "author": "BlackPanda",
+  "license": "AGPL-3.0"
+}

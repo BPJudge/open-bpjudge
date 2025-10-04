@@ -26,16 +26,19 @@ export async function apply(ctx: Context) {
     ctx.i18n.load('zh', {
         "No Online Users": '暂无在线用户',
         "There are {0} users online.": '共有 {0} 位用户在线',
+        "Online User": '在线用户',
         onlineuser: '在线用户',
     });
     ctx.i18n.load('zh_TW', {
         "No Online Users": '暫無線上使用者',
         "There are {0} users online.": '共有 {0} 位使用者線上',
+        "Online User": '線上使用者',
         onlineuser: '線上使用者',
     });
     ctx.i18n.load('kr', {
         "No Online Users": '온라인 사용자 없어요',
         "There are {0} users online.": '총 {0}명의 사용자가 온라인에 있어요',
+        "Online User": '온라인 사용자',
         onlineuser: '온라인 사용자',
     });
 }

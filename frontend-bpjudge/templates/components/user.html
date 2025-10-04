@@ -1,0 +1,70 @@
+{% macro render_inline(udoc, avatar=true, badge=true, modbadge=true, levelbadge=true, noLink=false, isModType=false, userProfile=false, trainingUdict=false) %}
+{% if udoc %}
+<span class="user-profile-link">
+  {% if avatar %}
+    <img class="small user-profile-avatar v-center" loading="lazy" src="{{ avatarUrl(udoc.avatar|default('')) }}" width="20" height="20">
+  {% endif %}
+
+  {% if noLink === false %}<a class="user-profile-name" href="{{ url('user_detail', uid=udoc._id) }}">{% endif %}
+  {% if noLink %}
+    {% if isModType %}
+      <span class="uname--su">
+    {% else %}
+      <span class="uname--lv{{ udoc.level|default(0) }}">
+    {% endif %}
+  {% else %}
+    {% if udoc and udoc.hasPriv and udoc.hasPerm %}  
+      {% if udoc.hasPriv(PRIV.PRIV_MOD_BADGE) %}
+        <span class="uname--su">
+      {% elif udoc.hasPerm(perm.PERM_MOD_BADGE) %}
+        <span class="uname--mod">
+      {% else %}
+        <span class="uname--lv{{ udoc.level|default(0) }}">
+      {% endif %}
+    {% else %}
+      <span>
+    {% endif %}
+  {% endif %}
+
+  {% if trainingUdict %}
+    {{ udoc.displayName }} ({{ udoc.uname }})
+  {% elif handler.user.hasPerm(perm.PERM_VIEW_DISPLAYNAME) and udoc.displayName and udoc.displayName != udoc.uname and noLink === false %}
+    {% if userProfile %}
+      {{ udoc.uname }} ({{ udoc.displayName }})
+    {% else %}
+      {{ udoc.displayName }} ({{ udoc.uname }})
+    {% endif %}
+  {% else %}
+    {{ udoc.uname }}
+  {% endif %}
+    </span>
+  {% if noLink === false %}</a>{% endif %}
+  
+  {% if badge %}
+    {% if udoc.badge %}
+      {% set _badge = udoc.badge.split('#') %}
+      <span class="user-profile-badge v-center" style="background-color:#{{ _badge[1] }}{% if _badge[2] %};color:#{{ _badge[2] }}{% endif %}">{{ _badge[0] }}</span>
+    {% endif %}
+    {% if modbadge %}
+      {% if udoc.hasPriv(PRIV.PRIV_MOD_BADGE) %}
+        <span class="user-profile-badge v-center badge--su" data-tooltip="{{ _('SuperUser') }}">SU</span>
+      {% elif udoc.hasPerm(perm.PERM_MOD_BADGE) %}
+        <span class="user-profile-badge v-center badge--mod" data-tooltip="{{ _('Moderator') }}">MOD</span>
+      {% endif %}
+    {% endif %}
+  {% endif %}
+</span>
+{% else %}
+  <span class="user-profile-link">
+    {% if avatar %}
+      <img class="small user-profile-avatar v-center" src="{{ UiContext.cdn_prefix }}img/avatar.png" width="20" height="20">
+    {% endif %}
+    <a class="user-profile-name" href="#">
+      {{ _('Unknown User') }}
+    </a>
+    {% if badge %}
+      <a class="user-profile-badge v-center badge--lv0" href="#" title="LV0">LV 0</a>
+    {% endif %}
+  </span>
+{% endif %}
+{% endmacro %}
