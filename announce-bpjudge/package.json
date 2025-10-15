@@ -1,0 +1,8 @@
+{
+    "name": "announce-bpjudge",
+    "version": "1.0.0",
+    "description": "Announce",
+    "main": "index.ts",
+    "author": "BlackPanda",
+    "license": "AGPL-3.0"
+}

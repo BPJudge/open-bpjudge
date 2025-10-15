@@ -1,0 +1,78 @@
+{% import "components/form.html" as form with context %}
+{% extends "layout/basic.html" %}
+{% block content %}
+<div class="row">
+  <div class="medium-9 columns">
+    <div class="section">
+      <div class="section__body">
+        <form method="post">
+          <div class="row">
+            {{ form.form_text({
+              columns:6,
+              label:'Title',
+              name:'title',
+              placeholder:_('title'),
+              value:adoc.title|default(''),
+              autofocus:true,
+              row:false
+            }) }}
+            {{ form.form_checkbox({
+              columns:2,
+              label:'Hidden',
+              name:'hidden',
+              placeholder:_('Is hidden'),
+              value:adoc.hidden|default(false),
+              row:false
+            }) }}
+            {{ form.form_checkbox({
+              columns:2,
+              label:'Highlight',
+              name:'highlight',
+              placeholder:_('Is highlight'),
+              value:adoc.highlight|default(false),
+              row:false
+            }) }}
+            {{ form.form_text({
+              columns:2,
+              label:'Pin',
+              name:'pin',
+              placeholder:_('pin'),
+              value:adoc.pin|default(0),
+              row:false
+            }) }}
+          </div>
+          {{ form.form_textarea({
+          columns:12,
+          label:'Content',
+          name:'content',
+          value:adoc.content|default(''),
+          markdown:true,
+          required:true,
+          extra_style:'height: 500px',
+          extra_textarea_class:'auto-resize'
+          }) }}
+          <div class="row">
+            <div class="columns">
+              <button name="operation" value="{{ 'update' if adoc else 'create' }}" data-default-submit type="submit"
+                class="rounded primary button">
+                {{ _('Update') if adoc else _('Create') }}
+              </button>
+              {% if adoc and handler.user.hasPerm(perm.PERM_EDIT_DOMAIN) %}
+              <button name="operation" value="delete" type="submit" class="rounded button" onclick="return confirm('确认删除这篇文章吗？')">
+                {{ _('Delete') }}
+              </button>
+              {% endif %}
+              <button type="button" class="rounded button" onclick="window.history.go(-1)">
+                {{ _('Cancel') }}
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="medium-3 columns">
+    {% include 'components/md_hint.html' %}
+  </div>
+</div>
+{% endblock %}

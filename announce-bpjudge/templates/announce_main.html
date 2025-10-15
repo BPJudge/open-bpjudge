@@ -1,0 +1,24 @@
+{% extends "layout/basic.html" %}
+{% block content %}
+<div class="row">
+  <div class="medium-9 columns">
+    <div class="section">
+    {% include "partials/announce_list.html" %}
+    </div>
+  </div>
+  <div class="medium-3 columns">
+    <div class="section side">
+      <div class="section__header">
+        <h1 class="section__title">{{ _('Create Announce') }}</h1>
+      </div>
+      <div class="section__body">
+        {% if handler.user.hasPerm(perm.PERM_EDIT_DOMAIN) %}
+          <p><a href="{{ url('announce_create') }}" class="expanded primary button">{{ _('Create a Announce') }}</a></p>
+        {% else %}
+          <p><a href="javascript:;" class="disabled expanded primary button">{{ _('No Permission to Create a Announce') }}</a></p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

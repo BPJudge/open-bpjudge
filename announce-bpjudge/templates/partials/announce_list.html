@@ -1,0 +1,29 @@
+{% import "components/nothing.html" as nothing with context %}
+{% import "components/user.html" as user with context %}
+{% import "components/paginator.html" as paginator with context %}
+{% if not adocs.length %}
+  {{ nothing.render('No announce yet...') }}
+{% else %}
+  <ol class="section__list discussion__list">
+  {%- for adoc in adocs -%}
+    <li class="section__list__item discussion__item{% if adoc.highlight %} highlight{% endif %}">
+      <div class="media">
+        <div class="media__body medium">
+          <h1 class="discussion__title"><a href="{{ url('announce_detail', aid=adoc._id) }}" data-emoji-enabled>{{ adoc['title'] }}</a></h1>
+          <ul class="supplementary list">
+            <li>{{ _('{0} views').format(adoc.views) }}</li>
+            <li>{{ user.render_inline(udict[adoc.owner]) }}</li>
+            <li>{{ datetimeSpan(adoc.updateAt)|safe }}</li>
+            {%- if adoc.hidden -%}
+              <li class="text-orange">({{ _('Hidden') }})</li>
+            {%- endif -%}
+          </ul>
+        </div>
+      </div>
+    </li>
+  {%- endfor -%}
+  </ol>
+  {% if page != undefined and apcount != undefined %}
+  {{ paginator.render(page, apcount) }}
+  {% endif %}
+{% endif %}

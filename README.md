@@ -56,3 +56,11 @@ idea from [topscoding](https://topscoding.com/).
 使用方法：
 
 进入控制面板->系统设置->`hydrooj.homepage` 添加如下配置： `active_user: true` 保存即可。
+
+## announce-bpjudge
+
+路由 `/announce`。
+
+首页展示公告：
+
+进入控制面板->系统设置->`hydrooj.homepage` 添加如下配置： `announce: <limit>` 保存即可，其中 `<limit>` 需**完整**替换为公告展示数量。
