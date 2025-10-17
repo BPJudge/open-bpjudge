@@ -17,6 +17,7 @@ export interface AnnounceDoc {
     views: number;
     sort: number;
     highlight: boolean;
+    global: boolean;
 }
 
 declare module 'hydrooj' {
@@ -31,7 +32,7 @@ declare module 'hydrooj' {
 export class AnnounceModel {
     static async add(
         domainId: string, owner: number, title: string, content: string, hidden: boolean, highlight: boolean,
-        pin: number, ip?: string
+        global: boolean, pin: number, ip?: string
     ): Promise<ObjectId> {
         const payload: Partial<AnnounceDoc> = {
             domainId,
@@ -42,6 +43,7 @@ export class AnnounceModel {
             ip,
             highlight,
             pin,
+            global,
             updateAt: new Date(),
             views: 0,
             sort: 100
@@ -79,8 +81,8 @@ export class AnnounceModel {
     }
 
     static getMulti(domainId: string, query: Filter<AnnounceDoc> = {}) {
-        return DocumentModel.getMulti(domainId, TYPE_ANNOUNCE, query)
-            .sort({ pin: -1, _id: -1 });
+        return DocumentModel.coll.find({ docType: TYPE_ANNOUNCE, ...query }).sort({ pin: -1, _id: -1 });
+        // return DocumentModel.getMulti(domainId, TYPE_ANNOUNCE, query)
     }
 
     static getStatus(domainId: string, aid: ObjectId, uid: number) {
@@ -109,7 +111,12 @@ class AnnounceHandler extends Handler {
 class AnnounceMainHandler extends AnnounceHandler {
     @param('page', Types.PositiveInt, true)
     async get(domainId: string, page = 1) {
-        const q: any = {};
+        const q: any = {
+            $or: [
+                { domainId },
+                { global: { $exists: true, $eq: true } },
+            ],
+        };
         if (!this.user.hasPerm(PERM.PERM_EDIT_DOMAIN)) {
             q.hidden = false;
         }
@@ -166,11 +173,12 @@ class AnnounceEditHandler extends AnnounceHandler {
     @param('content', Types.Content)
     @param('hidden', Types.Boolean)
     @param('highlight', Types.Boolean)
+    @param('global', Types.Boolean)
     @param('pin', Types.UnsignedInt)
-    async postCreate(domainId: string, title: string, content: string, hidden: boolean = false, highlight: boolean = false, pin: number) {
+    async postCreate(domainId: string, title: string, content: string, hidden: boolean = false, highlight: boolean = false, global: boolean = false, pin: number) {
         await this.limitRate('add_announce', 3600, 60);
         const aid = await AnnounceModel.add(
-            domainId, this.user._id, title, content, hidden, highlight, pin, this.request.ip
+            domainId, this.user._id, title, content, hidden, highlight, global, pin, this.request.ip
         );
         this.response.body = { aid };
         this.response.redirect = this.url('announce_detail', { domainId, aid });
@@ -181,11 +189,12 @@ class AnnounceEditHandler extends AnnounceHandler {
     @param('content', Types.Content)
     @param('hidden', Types.Boolean)
     @param('highlight', Types.Boolean)
+    @param('global', Types.Boolean)
     @param('pin', Types.UnsignedInt)
-    async postUpdate(domainId: string, aid: ObjectId, title: string, content: string, hidden: boolean = false, highlight: boolean = false, pin = 0) {
+    async postUpdate(domainId: string, aid: ObjectId, title: string, content: string, hidden: boolean = false, highlight: boolean = false, global: boolean = false, pin = 0) {
         await Promise.all([
             AnnounceModel.edit(domainId, aid, {
-                title, content, hidden, highlight, pin
+                title, content, hidden, highlight, global, pin
             }),
             OplogModel.log(this, 'announce.edit', this.adoc),
         ]);
@@ -204,7 +213,12 @@ class AnnounceEditHandler extends AnnounceHandler {
 }
 
 async function getAnnounce(domainId: string, limit = 10) {
-    const q: any = {};
+    const q: any = {
+        $or: [
+            { domainId },
+            { global: { $exists: true, $eq: true } },
+        ],
+    };
     if (!this.user.hasPerm(PERM.PERM_EDIT_DOMAIN)) {
         q.hidden = false;
     }
