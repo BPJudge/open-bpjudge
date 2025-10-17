@@ -1,4 +1,4 @@
-import { Handler, Context, param, Types, ObjectId, DocumentModel, _, NumberKeys, Filter, PERM, UserModel, NotFoundError, OplogModel, SettingModel } from "hydrooj";
+import { Handler, Context, param, Types, ObjectId, DocumentModel, _, NumberKeys, Filter, PERM, UserModel, NotFoundError, OplogModel, SettingModel, PRIV } from "hydrooj";
 
 export const TYPE_ANNOUNCE = 1000 as const;
 
@@ -141,6 +141,15 @@ class AnnounceDetailHandler extends AnnounceHandler {
     async get(domainId: string, aid: ObjectId) {
         if (this.adoc.hidden) {
             this.checkPerm(PERM.PERM_EDIT_DOMAIN);
+        }
+        const dsdoc = this.user.hasPriv(PRIV.PRIV_USER_PROFILE)
+            ? await AnnounceModel.getStatus(domainId, aid, this.user._id)
+            : null;
+        if (!dsdoc?.view) {
+            await Promise.all([
+                AnnounceModel.inc(domainId, aid, 'views', 1),
+                AnnounceModel.setStatus(domainId, aid, this.user._id, { view: true }),
+            ]);
         }
         const udoc = await UserModel.getById(domainId, this.adoc.owner);
         this.response.template = 'announce_detail.html';
