@@ -9,7 +9,7 @@
     <li class="section__list__item discussion__item{% if adoc.highlight %} highlight{% endif %}">
       <div class="media">
         <div class="media__body medium">
-          <h1 class="discussion__title"><a href="{{ url('announce_detail', aid=adoc._id) }}" data-emoji-enabled>{{ adoc['title'] }}</a></h1>
+          <h1 class="discussion__title"><a href="{{ url('announce_detail', domainId=adoc.domainId, aid=adoc._id) }}" data-emoji-enabled>{{ adoc['title'] }}</a></h1>
           <ul class="supplementary list">
             <li>{{ _('{0} views').format(adoc.views) }}</li>
             <li>{{ user.render_inline(udict[adoc.owner]) }}</li>
