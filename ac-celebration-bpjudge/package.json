@@ -1,0 +1,10 @@
+{
+  "name": "ac-celebration",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "BlackPanda",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "sweetalert2": "^11.26.3"
+  }
+}

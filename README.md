@@ -64,3 +64,11 @@ idea from [topscoding](https://topscoding.com/).
 首页展示公告：
 
 进入控制面板->系统设置->`hydrooj.homepage` 添加如下配置： `announce: <limit>` 保存即可，其中 `<limit>` 需**完整**替换为公告展示数量。
+
+## ac-celebration-bpjudge
+
+通过后展示 AC 弹窗动画。
+
+安装方式：将插件 clone 到本地，插件目录下执行 `yarn install` 安装依赖，执行 `hydrooj addon add <插件路径>` 然后 `pm2 restart hydrooj` 重启即可。
+
+使用方式：控制面板-系统设置中 `acImage` 类别下 `Image display duration` 和 `Image url` 字段分别对应弹窗动画持续时间和 AC 动画图片的路径。持续时间单位为**毫秒（ms）**。默认为 `3500` 和 `/ac-congrats.png`。
