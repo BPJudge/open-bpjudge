@@ -67,7 +67,7 @@ idea from [topscoding](https://topscoding.com/).
 
 ## ac-celebration-bpjudge
 
-通过后展示 AC 弹窗动画。
+提交通过后展示 AC 弹窗动画。
 
 安装方式：将插件 clone 到本地，插件目录下执行 `yarn install` 安装依赖，执行 `hydrooj addon add <插件路径>` 然后 `pm2 restart hydrooj` 重启即可。
 

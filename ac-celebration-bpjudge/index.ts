@@ -10,7 +10,14 @@ export function apply(ctx: Context) {
     ctx.on('handler/after/RecordDetail#get', async (that) => {
         const duration = ctx.setting.get('acImage.duration');
         const imgUrl = ctx.setting.get('acImage.url');
-        that.response.body.acImgDuration = duration;
-        that.response.body.acImgUrl = imgUrl;
+        that.UiContext.acImgDuration = duration;
+        that.UiContext.acImgUrl = imgUrl;
+        that.UiContext.rdoc = that.response.body.rdoc;
+    });
+    ctx.on('handler/after/ProblemDetail#get', async (that) => {
+        const duration = ctx.setting.get('acImage.duration');
+        const imgUrl = ctx.setting.get('acImage.url');
+        that.UiContext.acImgDuration = duration;
+        that.UiContext.acImgUrl = imgUrl;
     });
 }
