@@ -5,23 +5,24 @@ addPage(new AutoloadPage('mermaid', async () => {
     mermaid.initialize({
         startOnLoad: false,
         theme: 'default',
-        securityLevel: 'loose'
+        securityLevel: 'antiscript'
     });
     async function runMermaid($nodes) {
-        const eles = $nodes.find('.mermaid').toArray();
-        for (let i = 0; i < eles.length; i++) {
-            const element = eles[i];
-            const $element = $(element);
-            if ($element.data('rendered')) continue;
-            const code = $element.text();
+        const elements = $nodes.find('pre code.language-mermaid').toArray();
+        for (let i = 0; i < elements.length; i++) {
+            const $code = $(elements[i]);
+            const $pre = $code.parent();
+            if ($pre.data('rendered')) continue;
+            const code = $code.text();
             try {
                 const id = `mermaid-${Date.now()}-${i}`;
                 const { svg } = await mermaid.render(id, code);
-                $element.html(svg);
-                $element.data('rendered', true);
+                const $div = $('<div class="mermaid-rendered"></div>').html(svg);
+                $pre.replaceWith($div);
             } catch (e) {
                 console.error('Mermaid render error:', e);
-                $element.html(`<pre class="mermaid-error">${e.message}</pre>`);
+                const $error = $('<pre class="mermaid-error"></pre>').text(e.message);
+                $pre.replaceWith($error);
             }
         }
     }

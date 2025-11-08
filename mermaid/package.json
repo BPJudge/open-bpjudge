@@ -2,7 +2,9 @@
     "name": "mermaid",
     "main": "index.ts",
     "dependencies": {
-        "markdown-it-mermaid": "^0.2.5",
         "mermaid": "^11.12.1"
+    },
+    "devDependencies": {
+        "@hydrooj/ui-default": "^4.58.0-beta.10"
     }
 }
