@@ -1,11 +1,11 @@
 import { addPage, NamedPage, $, load, Socket } from '@hydrooj/ui-default';
 import Swal from 'sweetalert2';
 
-addPage(new NamedPage('problem_detail', async () => {
+addPage(new NamedPage(['problem_detail', 'homework_detail_problem', 'contest_detail_problem'], async () => {
     console.log('AC-Celebration is powered by OpenBPJudge Project https://github.com/BPJudge/open-bpjudge');
     let imageUrl = '/ac-congrats.png';
-    if (UiContext.acImgUrl) imageUrl = UiContext.acImgUrl;
     let timer = 3500;
+    if (UiContext.acImgUrl) imageUrl = UiContext.acImgUrl;
     if (UiContext.acImgDuration) timer = UiContext.acImgDuration;
     const showCongrats = () => Swal.fire({
         imageUrl,
@@ -26,12 +26,10 @@ addPage(new NamedPage('problem_detail', async () => {
         const rid = rdoc._id.toString();
         const prev = prevStatus.get(rid);
         console.log(rid, prev);
-        if (rdoc.status === 1 && prev !== 1) {
-            if (rdoc.uid === UserContext._id) {
-                if (!rdoc.contest) {
-                    showCongrats();
-                }
-            }
+        if (rdoc.contest && !UiContext.showInContest) return;
+        if (rdoc.contest && rdoc.contest.toString() === '000000000000000000000000') return;
+        if (rdoc.status === 1 && prev !== 1 && rdoc.uid === UserContext._id) {
+            showCongrats();
         }
         prevStatus.set(rid, rdoc.status);
     };
