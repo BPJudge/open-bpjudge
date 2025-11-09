@@ -76,3 +76,19 @@ idea from [topscoding](https://topscoding.com/).
 支持设置多张图片，AC 后将随机选择一张弹出。
 
 默认图片（`ac-congrats.png`）来源：[洛谷](https://www.luogu.com.cn/)。
+
+## mermaid
+
+支持渲染 mermaid。
+
+例如：
+
+````
+```mermaid
+flowchart LR
+A[Hard] -->|Text| B(Round)
+B --> C{Decision}
+C -->|One| D[Result 1]
+C -->|Two| E[Result 2]
+```
+````
