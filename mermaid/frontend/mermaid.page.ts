@@ -1,11 +1,16 @@
 import { $, addPage, AutoloadPage } from '@hydrooj/ui-default';
 
 addPage(new AutoloadPage('mermaid', async () => {
+    const style = document.createElement('style');
+    document.head.appendChild(style);
+    style.sheet.insertRule(`.mermaid-rendered .nodeLabel p { line-height: 1 !important; }`, style.sheet.cssRules.length);
+
     const mermaid = (await import('mermaid')).default;
     mermaid.initialize({
         startOnLoad: false,
         theme: 'default',
-        securityLevel: 'antiscript'
+        securityLevel: 'antiscript',
+        flowchart: { htmlLabels: false },
     });
     async function runMermaid($nodes) {
         const elements = $nodes.find('pre code.language-mermaid').toArray();
