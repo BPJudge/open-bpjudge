@@ -73,4 +73,6 @@ idea from [topscoding](https://topscoding.com/).
 
 使用方式：控制面板-系统设置中 `acImage` 类别下 `Image display duration` 和 `Image url` 字段分别对应弹窗动画持续时间和 AC 动画图片的路径。持续时间单位为**毫秒（ms）**。默认为 `3500` 和 `/ac-congrats.png`。
 
+支持设置多张图片，AC 后将随机选择一张弹出。
+
 默认图片（`ac-congrats.png`）来源：[洛谷](https://www.luogu.com.cn/)。
