@@ -87,7 +87,7 @@
           </div>
         {% else %}
           <div class="section__tools">
-            <div id="problem-vote-widget" style="display: inline-flex; margin-left: 1em;">
+            <div id="problem-vote-widget" style="display: inline-flex; position: absolute; top: 5px; right: 0; width: 100px;">
               <div class="vote vote--discussion dczcomments__item" style="display: flex; flex-direction: column; align-items: center; padding: 0.5em; min-width: 80px;">
                 <div class="vote-number rotator--enabled">
                   {{ pdoc.vote|default(0) }}
@@ -122,7 +122,7 @@
         {% endif %}
       </div>
       <div class="section__body">
-        <ul class="problem__tags">
+        <ul class="problem__tags"{% if not (tdoc and tdoc.pids|length <= 26) %} style="margin-right: 100px !important;"{% endif %}>
           {% if not tdoc %}
             <span class="problem__tag-item">{{ _('ID') }}: {{ pdoc.docId }}</span>
           {% endif %}
