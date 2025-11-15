@@ -18,8 +18,9 @@ addPage(new NamedPage(['problem_detail', 'homework_detail_problem', 'contest_det
         width: 'auto',
     });
     const prevStatus = new Map();
-    const sock = new WebSocket(UiContext.ws_prefix + UiContext.pretestConnUrl);
+    const sock = new Socket(UiContext.ws_prefix + UiContext.pretestConnUrl);
     sock.onmessage = (message) => {
+        if (message.data === 'ping') return;
         const msg = JSON.parse(message.data);
         // console.log(msg);
         const rdoc = msg.rdoc;

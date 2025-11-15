@@ -92,3 +92,7 @@ C -->|One| D[Result 1]
 C -->|Two| E[Result 2]
 ```
 ````
+
+## problem-vote
+
+登录用户可对题目投票。
