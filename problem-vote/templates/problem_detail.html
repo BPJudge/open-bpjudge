@@ -1,0 +1,183 @@
+{% extends "layout/basic.html" %}
+{% block content %}
+<script>
+{{ set(UiContext, {
+  problemId: pdoc.pid|default(pdoc.docId),
+  problemNumId: pdoc.docId,
+  codeLang: handler.user.codeLang,
+  codeTemplate: handler.user.codeTemplate,
+  pdoc: pdoc
+}) }}
+{% if tdoc %}
+  {{ set(UiContext, 'tdoc', tdoc) }}
+  {{ set(UiContext, 'tsdoc', tsdoc) }}
+{% endif %}
+{% if tdoc and mode == 'contest' %}
+  {{ set(UiContext, 'canViewRecord', model.contest.canShowSelfRecord.call(handler, tdoc)) }}
+  {{ set(UiContext, 'postSubmitUrl', url('problem_submit', pid=pdoc.docId, query={tid:tdoc.docId})) }}
+  {{ set(UiContext, 'getSubmissionsUrl', url('record_main', query={fullStatus:'true', pid:pdoc.docId, tid:tdoc.docId})) }}
+  {{ set(UiContext, 'getRecordDetailUrl', url('record_detail', rid='{rid}', query={tid:tdoc.docId})) }}
+  {{ set(UiContext, 'pretestConnUrl', "record-conn?pretest=1&uidOrName=" + handler.user._id + "&pid=" + pdoc.docId + "&domainId=" + handler.args.domainId + "&tid=" + tdoc.docId) }}
+{% else %}
+  {{ set(UiContext, 'canViewRecord', true) }}
+  {{ set(UiContext, 'postSubmitUrl', url('problem_submit', pid=pdoc.docId)) }}
+  {{ set(UiContext, 'getSubmissionsUrl', url('record_main', query={fullStatus:'true', pid:pdoc.docId})) }}
+  {{ set(UiContext, 'getRecordDetailUrl', url('record_detail', rid='{rid}')) }}
+  {{ set(UiContext, 'pretestConnUrl', "record-conn?pretest=1&uidOrName=" + handler.user._id + "&pid=" + pdoc.docId + "&domainId=" + handler.args.domainId) }}
+{% endif %}
+</script>
+{% if not tdoc %}
+  {% block ogp %}
+    {% set preferredLang = handler.request.query.lang or handler.user.viewLang or handler.session.viewLang %}
+    {% set renderredContent = pdoc.content|content(preferredLang, pdoc.html) %}
+    {% set langs = pdoc.content|contentLang %}
+    {% for k in langs %}
+      {% if k != preferredLang %}
+        <meta property="og:locale:alternate" content="{{ k }}" />
+      {% else %}
+        <meta property="og:locale" content="{{ k }}" />
+      {% endif %}
+    {% endfor %}
+    <meta property="og:title" content="{{ pdoc.pid|default(pdoc.docId) }}. {{ pdoc.title }} - {{ model.system.get('server.name') }}" />
+    <meta property="og:description" content="{{ renderredContent|problemPreview|truncate(100, true) }}" />
+  {% endblock %}
+{% endif %}
+<div class="row" data-sticky-parent>
+  <div class="medium-9 columns">
+    <div class="section">
+      <div class="section__header">
+        <h1 class="section__title">
+          {% if rdoc %}
+            <a href="{{ url('record_detail', {rid:rdoc._id}) }}">
+              <span class="icon record-status--icon {{ model.builtin.STATUS_CODES[rdoc['status']] }}"></span>
+              <span class="record-status--text {{ model.builtin.STATUS_CODES[rdoc['status']] }}">{{ rdoc.score }}</span>
+            </a>
+          {% endif %}
+          {% if handler.user.hasPriv(PRIV.PRIV_USER_PROFILE) and not tdoc %}
+            <form class="form--inline" action="" method="post">
+              <input type="hidden" name="star" value="{{ 'true' if not psdoc.star else 'false' }}">
+              <input type="hidden" name="operation" value="star">
+              <button class="star{% if psdoc.star %} activated{% endif %}" type="submit">
+                <span class="starred--hide"><span class="icon icon-star--outline" data-tooltip="{{ _('Star') }}"></span></span>
+                <span class="starred--show"><span class="icon icon-star" data-tooltip="{{ _('Unstar') }}"></span></span>
+              </button>
+            </form>
+          {% endif %}
+          {%- if tdoc -%}
+            {{ utils.getAlphabeticId(tdoc.pids.indexOf(pdoc.docId)) }}
+          {%- elif pdoc.pid and pdoc.pid.includes('-') -%}
+            {{ pdoc.pid.split('-').join('#') }}
+          {%- else -%}
+            #{{ pdoc.pid|default(pdoc.docId) }}
+          {%- endif -%}. {{ pdoc.title }}
+        </h1>
+        {% if tdoc and tdoc.pids|length <= 26 %}
+          <div class="section__tools contest-problems">
+            {% for pid in tdoc.pids -%}
+              {% set status = tsdoc.detail[pid].status %}
+              {% set pass = status == STATUS.STATUS_ACCEPTED %}
+              {% set fail = status and not pass %}
+              <a href="{{ url('problem_detail', pid=pid, query={tid:tdoc.docId}) }}"
+                 class="{% if pass %}pass{% elif fail %}fail{% endif %}
+                        {% if pid==pdoc.docId %} active{% endif %}">
+                <span class="id">{{ utils.getAlphabeticId(loop.index0) }}</span>
+                {% if status %}<span class="icon icon-{% if pass %}check{% else %}close{% endif %}"></span>{% endif %}
+              </a>
+            {%- endfor %}
+          </div>
+        {% else %}
+          <div class="section__tools">
+            <div id="problem-vote-widget" style="display: inline-flex; margin-left: 1em;">
+              <div class="vote vote--discussion dczcomments__item" style="display: flex; flex-direction: column; align-items: center; padding: 0.5em; min-width: 80px;">
+                <div class="vote-number rotator--enabled">
+                  {{ pdoc.vote|default(0) }}
+                </div>
+                <form method="post" class="vote-op clearfix">
+                  {% set userVote=psdoc.vote|default(0) %}
+                  <input type="hidden" name="psid" value="{{ pdoc.docId }}" />
+                  <button
+                    type="submit" name="operation" value="upvote"
+                    class="vote-button upvote{% if userVote == 1 %} active{% endif %}"
+                    data-tooltip-pos="bottom center"
+                    data-tooltip="{{ _('Upvote') }}"
+                    aria-label="{{ _('Upvote') }}"
+                    {% if not handler.user.hasPriv(PRIV.PRIV_USER_PROFILE) %}disabled{% endif %}
+                  >
+                    <span class="icon icon-vote--up"></span>
+                  </button>
+                  <button
+                    type="submit" name="operation" value="downvote"
+                    class="vote-button downvote{% if userVote == -1 %} active{% endif %}"
+                    data-tooltip-pos="bottom center"
+                    data-tooltip="{{ _('Downvote') }}"
+                    aria-label="{{ _('Downvote') }}"
+                    {% if not handler.user.hasPriv(PRIV.PRIV_USER_PROFILE) %}disabled{% endif %}
+                  >
+                    <span class="icon icon-vote--down"></span>
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      <div class="section__body">
+        <ul class="problem__tags">
+          {% if not tdoc %}
+            <span class="problem__tag-item">{{ _('ID') }}: {{ pdoc.docId }}</span>
+          {% endif %}
+          <span class="problem__tag-item icon icon-book">{{ _('problem_type.' + pdoc.config.type).format(pdoc.config.subType) }}</span>
+          {% if pdoc.config.type == 'default' and pdoc.config.subType %}
+            <span class="problem__tag-item icon icon-book">{{ _('File IO: {0}').format(pdoc.config.subType) }}</span>
+          {% endif %}
+          {% if pdoc.config.type != 'objective' and pdoc.config.type != 'submit_answer' %}
+            <span class="problem__tag-item icon icon-stopwatch">{{ pdoc.config.timeMax if pdoc.config.timeMax == pdoc.config.timeMin else pdoc.config.timeMin+'~'+pdoc.config.timeMax }}ms</span>
+            <span class="problem__tag-item icon icon-comparison">{{ pdoc.config.memoryMax if pdoc.config.memoryMax == pdoc.config.memoryMin else pdoc.config.memoryMin+'~'+pdoc.config.memoryMax }}MiB</span>
+          {% endif %}
+          {% if not tdoc %}
+            <a class="problem__tag-item interactive" href="{{ url('record_main', query={pid:pdoc.docId}) }}">{{ _('Tried') }}: {{ pdoc.nSubmit }}</a>
+            <a class="problem__tag-item interactive" href="{{ url('record_main', query={pid:pdoc.docId, status:1}) }}">{{ _('Accepted') }}: {{ pdoc.nAccept if ((not tdoc) or showAccept) else '?' }}</a>
+            <span class="problem__tag-item">{{ _('Difficulty') }}: {{ pdoc['difficulty'] or lib.difficulty(pdoc.nSubmit, pdoc.nAccept) or _('(None)') }}</span>
+            <span class="problem__tag-item interactive">{{ _('Uploaded By') }}: {{ user.render_inline(udoc, badge=false) }}</span>
+          {% endif %}
+          {% if pdoc.tag.length %}
+            <span name="show_tags" class="problem__tag-item interactive nojs--hide icon icon-tag">{{ _('Tags') + '>' }}</span>
+            {%- for tag in pdoc.tag -%}
+              <span class="problem__tag-item tags hasjs--hide">{{ tag }}</span>
+            {%- endfor -%}
+          {% endif %}
+        </ul>
+      </div>
+    </div>
+    <div class="section">
+      <div class="problem-content-container"><div class="problem-content" data-marker-enabled>
+        <div class="section__header non-scratchpad--hide">
+          <h1 class="section__title">{{ pdoc.title }}</h1>
+        </div>
+        {% if pdoc.content|contentLang|length > 1 %}
+        <div class="section__tab-container">
+          <div class="section__tab-header-wrapper">
+            <ul class="section__tab-header flex-row">
+              {% for k in pdoc.content|contentLang %}
+              <a class="section__tab-header-item {{'tab--active' if (handler.request.query.lang or handler.user.viewLang or handler.session.viewLang or (pdoc.content|contentLang)[0] ) == k }}" data-lang="{{ k }}" href="./{{pdoc.pid|default(pdoc.docId)}}?lang={{k}}">
+                {{ handler.ctx.i18n.get('__langname', k) or _('Unknown language') }}
+              </a>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        {% endif %}
+        {% include "partials/problem_description.html" %}
+      </div></div>
+    </div>
+  </div>
+  <div class="medium-3 columns"><div data-sticky="large">
+    {% include "partials/problem_sidebar.html" %}
+  </div></div>
+</div>
+<div style="display:none" class="outer-loader-container"><div class="loader"></div></div>
+<div class="scratchpad-container" style="display:none">
+  <div style="display:none" class="loader-container"><div class="loader"></div></div>
+  <div id="scratchpad" style="opacity:0"></div>
+</div>
+{% endblock %}

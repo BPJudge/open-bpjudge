@@ -1,0 +1,8 @@
+{
+  "name": "problem-vote-bpjudge",
+  "version": "0.0.1",
+  "description": "problem vote",
+  "main": "index.js",
+  "author": "Lyricus",
+  "license": "AGPL-3.0"
+}
