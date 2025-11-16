@@ -45,9 +45,20 @@ export function apply(ctx: Context) {
             const pdoc = await vote(domainId, +psid, this.user._id, -1);
             this.back({ vote: pdoc.vote, user_vote: -1 });
         }
+        ProblemDetailHandler.prototype.postCannelvote = async function postCannelvote() {
+            const { domainId, psid } = this.args;
+            if (!this.user.hasPriv(PRIV.PRIV_USER_PROFILE)) {
+                throw new ForbiddenError("You're not logged in.");
+            }
+            const pdoc = await vote(domainId, +psid, this.user._id, 0);
+            this.back({ vote: pdoc.vote, user_vote: 0 });
+        }
     });
 
     ctx.on('handler/before/ProblemDetail', async (h) => {
         h.UiContext.psdoc = h.response.body.psdoc;
+    });
+    ctx.i18n.load('zh',{
+        'Cancel Vote': '取消投票',
     });
 }
