@@ -1,0 +1,175 @@
+{% set STATUS_COLORS = {
+  '0': '#1890ff',
+  '1': '#52c41a',
+  '2': '#f5222d',
+  '3': '#052242',
+  '4': '#fa8c16',
+  '5': '#fa8c16',
+  '6': '#722ed1',
+  '7': '#fa8c16',
+  '8': '#1890ff',
+  '9': '#888888',
+  '10': '#888888',
+  '11': '#f5222d',
+  '20': '#1890ff',
+  '21': '#1890ff',
+  '22': '#1890ff',
+  '30': '#888888',
+  '31': '#f5222d',
+  '32': '#52c41a',
+  '33': '#f5222d'
+} %}
+
+{% set STATUS_TEXTS = {
+  '0': 'Waiting',
+  '1': 'AC',
+  '2': 'WA',
+  '3': 'TLE',
+  '4': 'MLE',
+  '5': 'OLE',
+  '6': 'RE',
+  '7': 'CE',
+  '8': 'SE',
+  '9': 'Canceled',
+  '10': 'UKE',
+  '11': 'Hacked',
+  '20': 'Running',
+  '21': 'Compiling',
+  '22': 'Fetched',
+  '30': 'Ignored',
+  '31': 'FE',
+  '32': 'Hack OK',
+  '33': 'Hack Fail'
+} %}
+
+{% set FULL_STATUS_TEXTS = {
+  '0': 'Waiting',
+  '1': 'Accepted',
+  '2': 'Wrong Answer',
+  '3': 'Time Exceeded',
+  '4': 'Memory Exceeded',
+  '5': 'Output Exceeded',
+  '6': 'Runtime Error',
+  '7': 'Compile Error',
+  '8': 'System Error',
+  '9': 'Cancelled',
+  '10': 'Unknown Error',
+  '11': 'Hacked',
+  '20': 'Running',
+  '21': 'Compiling',
+  '22': 'Fetched',
+  '30': 'Ignored',
+  '31': 'Format Error',
+  '32': 'Hack Successful',
+  '33': 'Hack Unsuccessful'
+} %}
+
+{% macro formatMessage(msg) %}
+  {% if not msg %}
+    {# 返回空字符串 #}
+  {% elif msg is string %}
+    {{ msg }}
+  {% elif msg.message and msg.params %}
+    {% set result = msg.message %}
+    {% for p in msg.params %}
+      {% set result = result|replace('{' ~ loop.index0 ~ '}', p) %}
+    {% endfor %}
+    {{ result }}
+  {% else %}
+    {{ msg }}
+  {% endif %}
+{% endmacro %}
+
+<div class="hydro-card-testcase-wrap" id="status">
+  {% if not rdoc.testCases or (rdoc.testCases|length) == 0 %}
+    <p style="padding: 8px 4px; color: #888;">{{ _('Waiting for judge...') }}</p>
+  {% else %}
+    {% set sortedCases = rdoc.testCases|sort(false, false, 'id') %}
+    {% if rdoc.subtasks|length > 0 %}
+      {% for subId, subtask in rdoc.subtasks %}
+        <div class="test-case-wrap">
+          <div class="subtask-header">
+            <span>#{{ subId }}</span>
+            {% set subStatusKey = '' ~ subtask.status %}
+            {% set subColor = STATUS_COLORS[subStatusKey]|default('#888') %}
+            <span style="color: {{ subColor }}">
+              {{ STATUS_TEXTS[subStatusKey]|default('UK') }}
+            </span>
+            <span>
+              {% if subtask.score is defined %}
+                {{ _('Score') }}: {{ subtask.score }}
+              {% endif %}
+            </span>
+          </div>
+          <div class="cases-grid">
+            {% for case in sortedCases %}
+              {% set sid = case.subtaskId|default(1) %}
+              {% if sid == subId|int %}
+                {% set caseKey = '' ~ case.status %}
+                {% set bg = STATUS_COLORS[caseKey]|default('#888') %}
+                <div class="case-wrapper">
+                  <div class="test-case" style="background: {{ bg }};">
+                    <div class="info">{{ case.time|default(0)|round(0) }} ms / {{ size(case.memory, 1024) }}</div>
+                    <div class="status">
+                      {{ STATUS_TEXTS[caseKey]|default('UK') }}
+                    </div>
+                    <div class="id">#{{ case.id }}</div>
+                  </div>
+                  {% set base = FULL_STATUS_TEXTS[caseKey]|default(STATUS_TEXTS[caseKey]|default('')) %}
+                  {% set msg_detail %}{% if case.message %}{{ formatMessage(case.message) }}{% endif %}{% endset %}
+                  {% set msg_detail = msg_detail|trim %}
+                  {% if msg_detail %}
+                    {% if base %}
+                      {% set tooltip = base ~ ', ' ~ msg_detail %}
+                    {% else %}
+                      {% set tooltip = msg_detail %}
+                    {% endif %}
+                  {% else %}
+                    {% set tooltip = base ~ '.' %}
+                  {% endif %}
+                  <div class="message">{{ tooltip|trim }}</div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+        </div>
+      {% endfor %}
+    {% else %}
+      <div class="test-case-wrap">
+        <div class="subtask-header">
+          <span>#1</span>
+          <span>{{ _('Subtask') }} 1</span>
+          <span></span>
+        </div>
+        <div class="cases-grid">
+          {% for case in sortedCases %}
+            {% set caseKey = '' ~ case.status %}
+            {% set bg = STATUS_COLORS[caseKey]|default('#888') %}
+            <div class="case-wrapper">
+              <div class="test-case" style="background: {{ bg }};">
+                <div class="info">{{ case.time|default(0)|round(0) }} ms / {{ size(case.memory, 1024) }}</div>
+                <div class="status">
+                  {{ STATUS_TEXTS[caseKey]|default('UK') }}
+                </div>
+                <div class="id">#{{ case.id }}</div>
+              </div>
+              {% set base = FULL_STATUS_TEXTS[caseKey]|default(STATUS_TEXTS[caseKey]|default('')) %}
+              {% set msg_detail %}{% if case.message %}{{ formatMessage(case.message) }}{% endif %}{% endset %}
+              {% set msg_detail = msg_detail|trim %}
+              {% if msg_detail %}
+                {% if base %}
+                  {% set tooltip = base ~ ', ' ~ msg_detail %}
+                {% else %}
+                  {% set tooltip = msg_detail %}
+                {% endif %}
+              {% else %}
+                {% set tooltip = base ~ '.' %}
+              {% endif %}
+              <div class="message">{{ tooltip|trim }}</div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    {% endif %}
+  {% endif %}
+</div>

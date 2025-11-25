@@ -1,0 +1,5 @@
+<div id="compiler">
+    {% if rdoc.compilerTexts.length %}
+    <pre class="compiler-text">{{ rdoc.compilerTexts|join('\n')|ansi|safe }}</pre>
+    {% endif %}
+</div>

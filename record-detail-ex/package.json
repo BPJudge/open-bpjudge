@@ -1,0 +1,14 @@
+{
+  "name": "record-detail-ex",
+  "version": "0.0.1",
+  "description": "new record detail",
+  "main": "index.js",
+  "author": "Lyricus",
+  "license": "AGPL-3.0",
+  "dependencies": {
+    "diff-dom": "^5.2.1"
+  },
+  "devDependencies": {
+    "hydrooj": "^5.0.0-beta.13"
+  }
+}
