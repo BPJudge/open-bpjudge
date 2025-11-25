@@ -13,14 +13,15 @@ async function getActiveUser(domainId) {
         { $project: { _id: '$_id' } },
         { $unwind: '$_id' },
     ]).toArray();
-    const udocs = await Promise.all(res.map(async (doc) => {
+    let udocs = await Promise.all(res.map(async (doc) => {
         const udoc = await UserModel.getById(domainId, doc._id);
         const sdoc = await TokenModel.getMostRecentSessionByUid(doc._id, ['updateAt', 'createAt']);
         udoc.updateAt = sdoc?.updateAt;
         return udoc;
     }));
+    udocs = udocs.filter(u => u.updateAt && !Number.isNaN(u.updateAt.getTime()));
+    const now = new Date();
     udocs.sort((a, b) => {
-        const now = new Date();
         return Math.abs(a.updateAt - now) - Math.abs(b.updateAt - now);
     });
     return [udocs];
