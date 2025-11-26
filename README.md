@@ -40,6 +40,15 @@ difficulty 1-7 分别对应：
 ];
 ```
 
+- 支持 Tuack 风格表格渲染。
+
+```
+::cute-table{tuack}
+| Header 1 | Header 2 |
+| -------- | -------- |
+| Cell 1   | Cell 2   |
+```
+
 其余难度为 "暂无评定"。
 
 ## onlineuser-bpjudge

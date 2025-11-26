@@ -1,13 +1,43 @@
 import {
-    UserModel, db, DomainModel, BaseUserDict, _,
+    UserModel, db, DomainModel, BaseUserDict, _, Context,
 } from 'hydrooj';
+import markdown from '@hydrooj/ui-default/backendlib/markdown';
 
 const collUser = db.collection('domain.user');
 export const coll: Collection<Udoc> = db.collection('user');
 export const collV: Collection<VUdoc> = db.collection('vuser');
 export const collGroup: Collection<GDoc> = db.collection('user.group');
 
-export async function apply(ctx) {
+function cuteTablePlugin(md) {
+    md.core.ruler.push('cute_table', (state) => {
+        const tokens = state.tokens;
+        for (let i = 0; i < tokens.length - 3; i++) {
+            if (tokens[i].type === 'paragraph_open'
+                && tokens[i + 1].type === 'inline'
+                && tokens[i + 2].type === 'paragraph_close'
+                && tokens[i + 3].type === 'table_open') {
+                const content = tokens[i + 1].content.trim();
+                const match = content.match(/^::cute-table\{(.+)\}$/);
+                if (match) {
+                    const className = match[1];
+                    tokens[i + 3].attrs = tokens[i + 3].attrs || [];
+                    const attr = tokens[i + 3].attrs.find((a) => a[0] === 'class');
+                    if (attr) {
+                        attr[1] += ` cute-table ${className}`;
+                    } else {
+                        tokens[i + 3].attrs.push(['class', `cute-table ${className}`]);
+                    }
+                    // remove the paragraph tokens
+                    tokens.splice(i, 3);
+                    i--;
+                }
+            }
+        }
+    });
+}
+
+export async function apply(ctx: Context) {
+    markdown.plugin(cuteTablePlugin);
     UserModel.getListForRender = async function (domainId: string, uids: number[], arg: string[] | boolean) {
         const fields = ['_id', 'uname', 'mail', 'avatar', 'school', 'studentId'].concat(arg instanceof Array ? arg : []);
         const showDisplayName = arg instanceof Array ? fields.includes('displayName') : arg;
