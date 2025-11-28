@@ -108,6 +108,8 @@ C -->|Two| E[Result 2]
 
 ## record-detail-ex
 
+插件目录运行 `yarn install` 安装依赖。
+
 偏好设置中开启「启用新型评测记录渲染（实验性）」选项。
 
 ![](record-detail-ex/public/intro.png)
