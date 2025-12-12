@@ -87,7 +87,7 @@
           </div>
         {% else %}
           <div class="section__tools">
-            <div id="problem-vote-widget" style="display: inline-flex; position: absolute; top: 5px; right: 0; width: 100px;">
+            <div id="problem-vote-widget" style="display: inline-flex; position: absolute; top: 5px; right: 0; width: 137px;">
               <div class="vote vote--discussion dczcomments__item" style="display: flex; flex-direction: column; align-items: center; padding: 0.5em; min-width: 80px;">
                 <div class="vote-number rotator--enabled">
                   {{ pdoc.vote|default(0) }}
@@ -104,6 +104,16 @@
                     {% if not handler.user.hasPriv(PRIV.PRIV_USER_PROFILE) %}disabled{% endif %}
                   >
                     <span class="icon icon-vote--up"></span>
+                  </button>
+                  <button
+                    type="submit" name="operation" value="cannelvote"
+                    class="vote-button cancelvote"
+                    data-tooltip-pos="bottom center"
+                    data-tooltip="{{ _('Cancel Vote') }}"
+                    aria-label="{{ _('Cancel Vote') }}"
+                    {% if not handler.user.hasPriv(PRIV.PRIV_USER_PROFILE) %}disabled{% endif %}
+                  >
+                    <span class="icon record-status--icon fail"></span>
                   </button>
                   <button
                     type="submit" name="operation" value="downvote"
